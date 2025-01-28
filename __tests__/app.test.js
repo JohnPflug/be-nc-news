@@ -107,3 +107,44 @@ describe("GET /api/articles", () => {
       })
   });
 })
+
+describe("GET /api/articles/:article_id/comments", () => {
+  test("200: Responds with an array of comments for the given article_id", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments.length).toBe(11);
+        expect(comments).toBeSortedBy('created_at', {
+          descending: true
+        })
+        comments.forEach((comment) => {
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            article_id: expect.any(Number),
+          });
+        })
+      })
+  });
+  test("400: Responds with message 'Bad Request: article_id must be a number' if article_id is not a number,", () => {
+    return request(app)
+      .get("/api/articles/not_a_number/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Bad Request: article_id must be a number');
+      })
+  })
+  test('404: Responds with error message when given a valid but non-existent article_id', () => {
+    return request(app)
+      .get("/api/articles/999/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Article does not exist');
+      });
+  });
+})

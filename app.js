@@ -1,7 +1,7 @@
 const express = require("express");
 const endpointsJson = require("./endpoints.json");
 const { getTopics } = require("./controllers/topics.controllers");
-const { getArticles, getAllArticles } = require("./controllers/articles.controllers");
+const { getArticlesByID, getAllArticles, getCommentsByArticleId } = require("./controllers/articles.controllers");
 
 const app = express();
 
@@ -11,9 +11,11 @@ app.get('/api', (req, res) => {
 
 app.get('/api/topics', getTopics);
 
-app.get('/api/articles/:article_id', getArticles);
-
 app.get('/api/articles', getAllArticles);
+
+app.get('/api/articles/:article_id', getArticlesByID);
+
+app.get('/api/articles/:article_id/comments', getCommentsByArticleId);
 
 // Invalid endpoints:
 app.use((req, res) => {
