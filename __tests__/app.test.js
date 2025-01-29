@@ -147,4 +147,90 @@ describe("GET /api/articles/:article_id/comments", () => {
         expect(body.msg).toBe('Article does not exist');
       });
   });
+  test('404: Responds with error message when given a valid, existent article_id, but there are no comments for said article', () => {
+    return request(app)
+      .get("/api/articles/2/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("No comments for article");
+      });
+  });
+})
+
+describe("POST /api/articles/:article_id/comments", () => {
+  test("201: Responds with a the information that was posted", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({
+        username: "icellusedkars",
+        body: "Test comment"
+      })
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.response).toMatchObject(
+          {
+            username: "icellusedkars",
+            body: "Test comment"
+          }
+        );
+      });
+  });
+  test("400: Responds with error message 'No body provided'", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({
+        username: "icellusedkars",
+      })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('No body provided');
+      })
+  });
+  test("400: Responds with error message 'Username not provided'", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({
+        body: "Test comment"
+      })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Username not provided');
+      })
+  });
+  test("404: Responds with error message 'Article does not exist'", () => {
+    return request(app)
+      .post("/api/articles/999/comments")
+      .send({
+        username: "icellusedkars",
+        body: "Test comment"
+      })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Article does not exist');
+      })
+  });
+  test("400: Responds with error message 'Bad Request: article_id must be a number'", () => {
+    return request(app)
+      .post("/api/articles/not_a_number/comments")
+      .send({
+        username: "icellusedkars",
+        body: "Test comment"
+      })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Bad Request: article_id must be a number');
+      })
+  });
+  test("400: Responds with error message 'Bad Request: Username does not exist'", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({
+        username: "John",
+        body: "Test comment"
+      })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Bad Request: Username does not exist');
+      })
+  });
 })
