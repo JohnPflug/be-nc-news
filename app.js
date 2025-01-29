@@ -2,6 +2,7 @@ const express = require("express");
 const endpointsJson = require("./endpoints.json");
 const { getTopics } = require("./controllers/topics.controllers");
 const { getArticlesByID, getAllArticles, getCommentsByArticleId, postCommentByArticleId, patchArticleById } = require("./controllers/articles.controllers");
+const { deleteCommentById } = require("./controllers/comments.controllers");
 
 const app = express();
 
@@ -25,6 +26,9 @@ app.post('/api/articles/:article_id/comments', postCommentByArticleId);
 
 // PATCH requests:
 app.patch('/api/articles/:article_id', patchArticleById);
+
+// DELETE requests:
+app.delete('/api/comments/:comment_id', deleteCommentById);
 
 // Invalid endpoints:
 app.use((req, res) => {
