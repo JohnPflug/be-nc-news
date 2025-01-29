@@ -1,5 +1,6 @@
-const { getArticlesByIdData, getAllArticlesData, getCommentsByArticleIdData } = require("../models/articles.models");
+const { getArticlesByIdData, getAllArticlesData, getCommentsByArticleIdData, postCommentByArticleIdData } = require("../models/articles.models");
 
+// GET controllers:
 exports.getArticlesByID = (req, res, next) => {
     const { article_id } = req.params;
     getArticlesByIdData(article_id).then((response) => {
@@ -22,6 +23,21 @@ exports.getCommentsByArticleId = (req, res, next) => {
     getCommentsByArticleIdData(article_id).then((rows) => {
         res.status(200).send({ comments: rows });
         console.log({ comments: rows });
+    }).catch((err) => {
+        next(err);
+    })
+}
+
+// POST controllers:
+exports.postCommentByArticleId = (req, res, next) => {
+    const { article_id } = req.params;
+    const { username, body } = req.body;
+    const responseData = {
+        username,
+        body
+    };
+    postCommentByArticleIdData(article_id, username, body).then(() => {
+        res.status(201).json({ response: responseData });
     }).catch((err) => {
         next(err);
     })

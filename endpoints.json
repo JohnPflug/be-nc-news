@@ -77,5 +77,19 @@
         }
       ]
     }
+  },
+  "POST /api/articles/:article_id/comments": {
+    "description": "Posts a comment on a given article. Requires an existing username and body content in payload",
+    "queries": [],
+    "examplePost": {
+      "username": "icellusedkars",
+      "body": "Test comment"
+    },
+    "exampleResponse": {
+      "response": {
+        "username": "icellusedkars",
+        "body": "Test comment"
+      }
+    }
   }
 }
