@@ -1,4 +1,4 @@
-const { getArticlesByIdData, getAllArticlesData, getCommentsByArticleIdData, postCommentByArticleIdData } = require("../models/articles.models");
+const { getArticlesByIdData, getAllArticlesData, getCommentsByArticleIdData, postCommentByArticleIdData, patchArticleByIdData } = require("../models/articles.models");
 
 // GET controllers:
 exports.getArticlesByID = (req, res, next) => {
@@ -22,7 +22,6 @@ exports.getCommentsByArticleId = (req, res, next) => {
     const { article_id } = req.params;
     getCommentsByArticleIdData(article_id).then((rows) => {
         res.status(200).send({ comments: rows });
-        console.log({ comments: rows });
     }).catch((err) => {
         next(err);
     })
@@ -42,3 +41,14 @@ exports.postCommentByArticleId = (req, res, next) => {
         next(err);
     })
 }
+
+// PATCH controllers:
+exports.patchArticleById = (req, res, next) => {
+    const { article_id } = req.params;
+    const { inc_votes } = req.body;
+    patchArticleByIdData(article_id, inc_votes).then((rows) => {
+        res.status(200).send({ article: rows })
+    }).catch((err) => {
+        next(err);
+    })
+};
