@@ -112,5 +112,12 @@
         }
       ]
     }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "Deletes the comment referenced by comment_id, response with status 204",
+    "queries": [],
+    "exampleResponse": {
+      "status": 204
+    }
   }
 }

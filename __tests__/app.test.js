@@ -291,3 +291,27 @@ describe("PATCH /api/articles/:article_id", () => {
       })
   });
 })
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("204: Responds with the updated article, including the new number of votes", () => {
+    return request(app)
+      .delete("/api/comments/11")
+      .expect(204)
+  });
+  test("404: Responds with error message 'Comment does not exist' if the comment does not exist", () => {
+    return request(app)
+      .delete("/api/comments/999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Comment does not exist');
+      })
+  });
+  test("400: Responds with errormessage 'Bad Request: comment_id must be an integer'", () => {
+    return request(app)
+      .delete("/api/comments/not_a_number")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Bad Request: comment_id must be an integer');
+      })
+  });
+})
