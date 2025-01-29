@@ -42,7 +42,7 @@ exports.getCommentsByArticleIdData = (article_id) => {
                     WHERE article_id = $1
                     ORDER BY created_at DESC`, [article_id]).then(({ rows }) => {
                         if (rows.length === 0) {
-                            return Promise.reject({ status: 404, msg: "No comments for article" });
+                            return Promise.reject({ status: 200, msg: "No comments for article" });
                         }
                         else return rows;
                     })
@@ -83,3 +83,33 @@ exports.postCommentByArticleIdData = (article_id, username, body) => {
         });
     } else return Promise.reject({ status: 400, msg: 'Bad Request: article_id must be a number' });
 };
+
+exports.patchArticleByIdData = (article_id, inc_votes) => {
+    if (/^\d+$/.test(article_id)) {
+        return db.query(
+            `SELECT *
+            FROM articles
+            WHERE article_id = $1`, [article_id]
+        ).then(({ rows }) => {
+            if (rows.length === 0) {
+                return Promise.reject({ status: 404, msg: "Article does not exist" });
+            } else if (inc_votes) {
+                if (/^-?\d+$/.test(inc_votes)) {
+                    return db.query(
+                        `UPDATE articles
+                        SET votes = votes + $1
+                        WHERE article_id = $2`, [inc_votes, article_id]
+                    ).then(() => {
+                        return db.query(
+                            `SELECT *
+                            FROM articles
+                            WHERE article_id = $1`, [article_id]
+                        ).then(({ rows }) => {
+                            return rows;
+                        })
+                    })
+                } else return Promise.reject({ status: 400, msg: "Votes must be an integer" });
+            } else return Promise.reject({ status: 400, msg: "Votes not provided" });
+        });
+    } else return Promise.reject({ status: 400, msg: 'Bad Request: article_id must be a number' });
+}

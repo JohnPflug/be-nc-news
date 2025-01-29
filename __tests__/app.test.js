@@ -147,10 +147,10 @@ describe("GET /api/articles/:article_id/comments", () => {
         expect(body.msg).toBe('Article does not exist');
       });
   });
-  test('404: Responds with error message when given a valid, existent article_id, but there are no comments for said article', () => {
+  test('200: Responds with error message when given a valid, existent article_id, but there are no comments for said article', () => {
     return request(app)
       .get("/api/articles/2/comments")
-      .expect(404)
+      .expect(200)
       .then(({ body }) => {
         expect(body.msg).toBe("No comments for article");
       });
@@ -158,7 +158,7 @@ describe("GET /api/articles/:article_id/comments", () => {
 })
 
 describe("POST /api/articles/:article_id/comments", () => {
-  test("201: Responds with a the information that was posted", () => {
+  test("201: Responds with the information that was posted", () => {
     return request(app)
       .post("/api/articles/1/comments")
       .send({
@@ -231,6 +231,63 @@ describe("POST /api/articles/:article_id/comments", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe('Bad Request: Username does not exist');
+      })
+  });
+})
+
+describe("PATCH /api/articles/:article_id", () => {
+  test("200: Responds with the updated article, including the new number of votes", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: 1 })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.article).toMatchObject([{ "article_id": 1, "title": 'Living in the shadow of a great man', "topic": 'mitch', "author": 'butter_bridge', "body": 'I find this existence challenging', "created_at": "2020-07-09T20:11:00.000Z", "votes": 101, "article_img_url": 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700' }])
+      })
+  });
+  test("200: Responds with the updated article when inc_votes value is negative", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: -1 })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.article).toMatchObject([{ "article_id": 1, "title": 'Living in the shadow of a great man', "topic": 'mitch', "author": 'butter_bridge', "body": 'I find this existence challenging', "created_at": "2020-07-09T20:11:00.000Z", "votes": 99, "article_img_url": 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700' }])
+      })
+  });
+  test("400: Responds with error message 'Bad Request: article_id must be a number'", () => {
+    return request(app)
+      .patch("/api/articles/not_a_number")
+      .send({ inc_votes: 1 })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Bad Request: article_id must be a number');
+      })
+  });
+  test("400: Responds with error message 'Article does not exist'", () => {
+    return request(app)
+      .patch("/api/articles/999")
+      .send({ inc_votes: 1 })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Article does not exist');
+      })
+  });
+  test("400: Responds with error message 'Votes must be an integer'", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: "hello" })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Votes must be an integer');
+      })
+  });
+  test("400: Responds with error message 'Votes must be an integer'", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: 1.5 })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe('Votes must be an integer');
       })
   });
 })
