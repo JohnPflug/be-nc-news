@@ -3,6 +3,7 @@ const endpointsJson = require("./endpoints.json");
 const { getTopics } = require("./controllers/topics.controllers");
 const { getArticlesByID, getAllArticles, getCommentsByArticleId, postCommentByArticleId, patchArticleById } = require("./controllers/articles.controllers");
 const { deleteCommentById } = require("./controllers/comments.controllers");
+const { getAllUsers } = require("./controllers/users.controllers");
 
 const app = express();
 
@@ -16,6 +17,8 @@ app.get('/api', (req, res) => {
 app.get('/api/topics', getTopics);
 
 app.get('/api/articles', getAllArticles);
+
+app.get('/api/users', getAllUsers);
 
 app.get('/api/articles/:article_id', getArticlesByID);
 
@@ -39,7 +42,11 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
     if (err.code === "22P02") {
         res.status(400).send({ msg: "Invalid input" });
-    } else next(err);
+    } else if (err.code === "23505") {
+        res.status(409).send({ msg: "Duplicate key value" });
+    } else {
+        next(err);
+    }
 });
 
 app.use((err, req, res, next) => {

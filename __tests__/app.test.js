@@ -263,7 +263,7 @@ describe("PATCH /api/articles/:article_id", () => {
         expect(body.msg).toBe('Bad Request: article_id must be a number');
       })
   });
-  test("400: Responds with error message 'Article does not exist'", () => {
+  test("404: Responds with error message 'Article does not exist'", () => {
     return request(app)
       .patch("/api/articles/999")
       .send({ inc_votes: 1 })
@@ -312,6 +312,42 @@ describe("DELETE /api/comments/:comment_id", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.msg).toBe('Bad Request: comment_id must be an integer');
+      })
+  });
+})
+
+describe("GET /api/users", () => {
+  test("200: Responds with the updated article, including the new number of votes", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.users).toMatchObject(
+          [
+            {
+              username: 'butter_bridge',
+              name: 'jonny',
+              avatar_url:
+                'https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg'
+            },
+            {
+              username: 'icellusedkars',
+              name: 'sam',
+              avatar_url: 'https://avatars2.githubusercontent.com/u/24604688?s=460&v=4'
+            },
+            {
+              username: 'rogersop',
+              name: 'paul',
+              avatar_url: 'https://avatars2.githubusercontent.com/u/24394918?s=400&v=4'
+            },
+            {
+              username: 'lurker',
+              name: 'do_nothing',
+              avatar_url:
+                'https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png'
+            }
+          ]
+        );
       })
   });
 })
