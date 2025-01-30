@@ -18,7 +18,7 @@ exports.getArticlesByIdData = (article_id) => {
 };
 
 exports.getAllArticlesData = (queries) => {
-    const { sort_by = "created_at", order = "DESC" } = queries;
+    const { sort_by = "created_at", order = "DESC", topic } = queries;
     // Greenlit query values:
     const allowedSort_byValues = ["article_id", "title", "topic", "author", "created_at", "votes", "article_img_url", "comment_count"];
     const allowedOrderValues = ["asc", "ASC", "desc", "DESC"];
@@ -27,13 +27,28 @@ exports.getAllArticlesData = (queries) => {
         return Promise.reject({ status: 400, msg: "Invalid query" });
     }
     // Construct query:
-    const queryStr =
+    let queryValues = [];
+    let queryStr =
         `SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.article_id) AS comment_count
         FROM articles
-        LEFT JOIN comments ON articles.article_id = comments.article_id
+        LEFT JOIN comments ON articles.article_id = comments.article_id`
+    if (topic) {
+        queryValues.push(topic);
+        queryStr +=
+            `
+            WHERE articles.topic = $1`;
+    }
+    queryStr +=
+        `
         GROUP BY articles.article_id
         ORDER BY articles.${sort_by} ${order}`;
-    return db.query(queryStr);
+
+    return db.query(queryStr, queryValues).then(({ rows }) => {
+        if (rows.length === 0) {
+            return Promise.reject({ status: 404, msg: "No articles found with this topic" })
+        }
+        else return rows;
+    })
 }
 
 exports.getCommentsByArticleIdData = (article_id) => {

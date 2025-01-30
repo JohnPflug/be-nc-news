@@ -12,7 +12,7 @@ exports.getArticlesByID = (req, res, next) => {
 
 exports.getAllArticles = (req, res, next) => {
     const queries = req.query;
-    getAllArticlesData(queries).then(({ rows }) => {
+    getAllArticlesData(queries).then((rows) => {
         res.status(200).send({ articles: rows });
     }).catch((err) => {
         next(err);
