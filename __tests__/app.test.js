@@ -170,7 +170,71 @@ describe("GET /api/articles", () => {
         expect(body.msg).toBe("Invalid query")
       })
   })
-});
+  test("200: Responds with an array of articles with the topic entered as a query", () => {
+    return request(app)
+      .get("/api/articles?topic=cats")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body
+        expect(articles.length).toBe(1);
+        expect(articles[0]).toMatchObject({
+          article_id: 5,
+          title: 'UNCOVERED: catspiracy to bring down democracy',
+          topic: 'cats',
+          author: 'rogersop',
+          created_at: "2020-08-03T13:14:00.000Z",
+          votes: 0,
+          article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+          comment_count: '2'
+        })
+      })
+  })
+  test("200: Responds with an array of articles with the topic entered as a query, checking that they array is ordered by default", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body
+        expect(articles.length).toBe(12);
+        expect(articles).toBeSortedBy('created_at', {
+          descending: true
+        })
+      })
+  })
+  test("200: Responds with an array of articles with the topic entered as a query, checking that they array is ordered by 'article_id'", () => {
+    return request(app)
+      .get("/api/articles?sort_by=article_id&topic=mitch")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body
+        expect(articles.length).toBe(12);
+        expect(articles).toBeSortedBy('article_id', {
+          descending: true
+        })
+      })
+  })
+  test("200: Responds with an array of articles with the topic entered as a query, checking that they array is ordered by 'article_id'", () => {
+    return request(app)
+      .get("/api/articles?sort_by=article_id&order=asc&topic=mitch")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body
+        expect(articles.length).toBe(12);
+        expect(articles).toBeSortedBy('article_id', {
+          descending: false
+        })
+      })
+  })
+  test("404: Responds with message 'No articles found with this topic' when no articles found for topic", () => {
+    return request(app)
+      .get("/api/articles?topic=not_a_topic")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("No articles found with this topic");
+      })
+  })
+})
+
 
 describe("GET /api/articles/:article_id/comments", () => {
   test("200: Responds with an array of comments for the given article_id", () => {
