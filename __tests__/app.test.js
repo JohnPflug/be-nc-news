@@ -287,12 +287,13 @@ describe("GET /api/articles/:article_id/comments", () => {
         expect(body.msg).toBe('Article does not exist');
       });
   });
-  test('200: Responds with error message when given a valid, existent article_id, but there are no comments for said article', () => {
+  test('200: Responds with an empty array when given a valid, existent article_id, but there are no comments for said article', () => {
     return request(app)
       .get("/api/articles/2/comments")
       .expect(200)
       .then(({ body }) => {
-        expect(body.msg).toBe("No comments for article");
+        console.log(body.comments);
+        expect(body.comments).toEqual([]);
       });
   });
 })
@@ -313,6 +314,32 @@ describe("POST /api/articles/:article_id/comments", () => {
             body: "Test comment"
           }
         );
+      });
+  });
+  test("201: Checks that the comment was posted to the article", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({
+        username: "icellusedkars",
+        body: "Test comment"
+      })
+      .expect(201)
+      .then(() => {
+        return db.query(`
+          SELECT *
+          FROM comments
+          WHERE author = 'icellusedkars' AND body = 'Test comment'`
+        );
+      })
+      .then(({ rows }) => {
+        expect(rows[0]).toMatchObject({
+          comment_id: 19,
+          body: 'Test comment',
+          article_id: 1,
+          author: 'icellusedkars',
+          votes: 0,
+          // created_at: expect.any(String),
+        })
       });
   });
   test("400: Responds with error message 'No body provided'", () => {

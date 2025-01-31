@@ -68,10 +68,10 @@ exports.getCommentsByArticleIdData = (article_id) => {
                     FROM comments
                     WHERE article_id = $1
                     ORDER BY created_at DESC`, [article_id]).then(({ rows }) => {
-                        if (rows.length === 0) {
-                            return Promise.reject({ status: 200, msg: "No comments for article" });
-                        }
-                        else return rows;
+                        // if (rows.length === 0) {
+                        //     return Promise.reject({ status: 200, msg: "No comments for article" });
+                        // }
+                        return rows;
                     })
             })
     } else return Promise.reject({ status: 400, msg: 'Bad Request: article_id must be a number' });
