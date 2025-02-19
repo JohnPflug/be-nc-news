@@ -31,7 +31,7 @@ exports.getAllArticlesData = (queries) => {
     // Construct query:
     let queryValues = [];
     let queryStr =
-        `SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.article_id) AS comment_count
+        `SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, cast(COUNT(comments.comment_id) AS INT) AS comment_count
         FROM articles
         LEFT JOIN comments ON articles.article_id = comments.article_id`
     if (topic) {
@@ -43,7 +43,7 @@ exports.getAllArticlesData = (queries) => {
     queryStr +=
         `
         GROUP BY articles.article_id
-        ORDER BY articles.${sort_by} ${order}`;
+        ORDER BY ${sort_by} ${order}`;
 
     return db.query(queryStr, queryValues).then(({ rows }) => {
         if (rows.length === 0) {

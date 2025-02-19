@@ -110,7 +110,7 @@ describe("GET /api/articles", () => {
             created_at: expect.any(String),
             votes: expect.any(Number),
             article_img_url: expect.any(String),
-            comment_count: expect.any(String),
+            comment_count: expect.any(Number),
           })
         })
         expect(articles).toBeSortedBy('created_at', {
@@ -134,7 +134,7 @@ describe("GET /api/articles", () => {
             created_at: expect.any(String),
             votes: expect.any(Number),
             article_img_url: expect.any(String),
-            comment_count: expect.any(String),
+            comment_count: expect.any(Number),
           })
         })
         expect(articles).toBeSortedBy('article_id', {
@@ -158,11 +158,33 @@ describe("GET /api/articles", () => {
             created_at: expect.any(String),
             votes: expect.any(Number),
             article_img_url: expect.any(String),
-            comment_count: expect.any(String),
+            comment_count: expect.any(Number),
           })
         })
         expect(articles).toBeSortedBy('article_id', {
           descending: false
+        })
+      })
+  });
+  test("200: Responds with an array of articles sorted by votes (descending by default)", () => {
+    return request(app)
+      .get("/api/articles?sort_by=votes")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeSortedBy('votes', {
+          descending: true
+        })
+      })
+  });
+  test("200: Responds with an array of articles sorted by comment_count (descending by default)", () => {
+    return request(app)
+      .get("/api/articles?sort_by=comment_count")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toBeSortedBy('comment_count', {
+          descending: true
         })
       })
   });
@@ -197,7 +219,7 @@ describe("GET /api/articles", () => {
           created_at: "2020-08-03T13:14:00.000Z",
           votes: 0,
           article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
-          comment_count: '2'
+          comment_count: 2
         })
       })
   })
@@ -292,7 +314,6 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/2/comments")
       .expect(200)
       .then(({ body }) => {
-        console.log(body.comments);
         expect(body.comments).toEqual([]);
       });
   });
