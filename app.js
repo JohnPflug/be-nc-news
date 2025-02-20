@@ -1,9 +1,9 @@
 const express = require("express");
+const articlesRouter = require("./routes/articles-router");
 const endpointsJson = require("./endpoints.json");
-const { getTopics } = require("./controllers/topics.controllers");
-const { getArticlesByID, getAllArticles, getCommentsByArticleId, postCommentByArticleId, patchArticleById } = require("./controllers/articles.controllers");
-const { deleteCommentById } = require("./controllers/comments.controllers");
 const { getAllUsers } = require("./controllers/users.controllers");
+const { getTopics } = require("./controllers/topics.controllers");
+const { deleteCommentById } = require("./controllers/comments.controllers");
 const cors = require('cors');
 
 const app = express();
@@ -13,27 +13,17 @@ app.use(cors());
 app.use(express.json());
 
 // GET requests:
+
 app.get('/api', (req, res) => {
     res.status(200).send({ endpoints: endpointsJson });
 });
 
 app.get('/api/topics', getTopics);
 
-app.get('/api/articles', getAllArticles);
-
 app.get('/api/users', getAllUsers);
 
-app.get('/api/articles/:article_id', getArticlesByID);
+app.use('/api/articles', articlesRouter);
 
-app.get('/api/articles/:article_id/comments', getCommentsByArticleId);
-
-// POST requests:
-app.post('/api/articles/:article_id/comments', postCommentByArticleId);
-
-// PATCH requests:
-app.patch('/api/articles/:article_id', patchArticleById);
-
-// DELETE requests:
 app.delete('/api/comments/:comment_id', deleteCommentById);
 
 // Invalid endpoints:
