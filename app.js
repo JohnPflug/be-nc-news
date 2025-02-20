@@ -1,7 +1,7 @@
 const express = require("express");
 const articlesRouter = require("./routes/articles-router");
+const usersRouter = require("./routes/users-router");
 const endpointsJson = require("./endpoints.json");
-const { getAllUsers } = require("./controllers/users.controllers");
 const { getTopics } = require("./controllers/topics.controllers");
 const { deleteCommentById } = require("./controllers/comments.controllers");
 const cors = require('cors');
@@ -20,7 +20,7 @@ app.get('/api', (req, res) => {
 
 app.get('/api/topics', getTopics);
 
-app.get('/api/users', getAllUsers);
+app.use('/api/users', usersRouter);
 
 app.use('/api/articles', articlesRouter);
 
